@@ -114,10 +114,13 @@ void roomStuff(Player&, Room&);
 void movePlayer(Player& , Room[]);
 void enemyConstructor();
 void mapConstructor(Room rooms[]);
+bool char_validation();
+string playerChoice();
 
 
 int main(){
 
+    string input;
     Room rooms[4];
     enemyConstructor();
     mapConstructor(rooms);
@@ -135,7 +138,13 @@ int main(){
 
         roomStuff(player, rooms[player.room]);
 
-        movePlayer(player, rooms);
+        input = playerChoice();
+
+        if(input == "E")
+            movePlayer(player, rooms);
+
+        if(input == "L")
+            cout << rooms[player.room].description << endl;
 
 
 
@@ -186,10 +195,10 @@ void fight(Player& player, Enemy& enemy){
 
 void roomStuff(Player &player, Room &room){
 
-    cout << room.description << endl;
 
     if(!room.explored)
     {
+        cout << room.description << endl;
 
         if(room.roomEnemy.hp > 0)
         {
@@ -242,7 +251,7 @@ void mapConstructor(Room rooms[]){
 
     rooms[3] = Room(
     3,
-    "The treasure room.",
+    "The stairwell.",
     -1, -1, 2, 1,
     Enemy()
     );
@@ -250,17 +259,24 @@ void mapConstructor(Room rooms[]){
 
 }
 
-
 void movePlayer(Player& player, Room rooms[])
 {
-    char choice;
-
+    string choice;
+    cout << "There are doors to the: ";
+    if(rooms[player.room].north > 0)
+        cout << "North\t";
+    if(rooms[player.room].east > 0)
+        cout << "East\t";
+    if(rooms[player.room].south > 0)
+        cout << "South\t";
+    if(rooms[player.room].west > 0)
+        cout << "West\t";
     cout << "\nDirection (N/E/S/W): ";
-    cin >> choice;
+    getline(cin,choice);
 
-    choice = toupper(choice);
+    choice = toupper(choice[0]);
 
-    switch(choice)
+    switch(choice[0])
     {
         case 'N':
             if(rooms[player.room].north != -1)
@@ -285,4 +301,43 @@ void movePlayer(Player& player, Room rooms[])
         default:
             cout << "Invalid direction!\n";
     }
+}
+
+bool char_validation(string c)
+{
+
+    bool valid = true;
+
+    if(!(isalpha(c[0])) || !(c.size() == 1)){
+        valid = false;
+    }
+    if(!valid){
+        cout << "invalid input" << endl;
+        return false;
+    }
+    return true;
+
+}
+
+string playerChoice(){
+    string choice;
+    bool valid = false;
+
+    while(!valid){
+        cout << "Would you like to: " << endl;
+        cout << "[L]ook around \t" << "[E]xplore further" << endl;
+
+        getline(cin, choice);
+        choice = toupper(choice[0]);
+
+        if(choice =="E" || choice == "L")
+            valid = true;
+        
+        if(!valid)
+            cout << "Invalid Input" << endl;
+
+    }
+
+    return choice;
+
 }
