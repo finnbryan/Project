@@ -112,6 +112,11 @@ class Room{
 
 };
 
+class chest
+{
+
+};
+
 
 
 void fight(Player&, Enemy&);
@@ -220,6 +225,24 @@ void fight(Player& player, Enemy& enemy){
 
 
 
+}
+
+void chest(Player &player)
+{
+    cout << "Would you like to open a chest. [Y]es or [N]o" << endl;
+    char input;
+
+
+    if(input == 'Y')
+    {
+        cout << "You have opened a chest " << endl;
+
+    }
+
+    if(input == 'N')
+    {
+
+    }
 }
 
 void roomStuff(Player &player, Room &room){
@@ -508,19 +531,30 @@ int items(Player& player, bool& drank)
 }
 
 void choice(Enemy& enemy, Player& player, bool& flee)
-    {
-        int sword, spear, axe, chance;
-        char input;
+{
+    int sword, spear, axe, chance;
+    char input;
         
-        bool valid = false;
-        bool escape = false;
-        
-        do
+    bool valid = false;
+    bool escape = false;
+
+    
+    do
+    {  
+        cout << "Will you [A]ttack/[D]odge/[F]lee/[I]tem/[R]isky Final attack/[G]ameplay logic: " << endl;
+        cin >> input;
+        cin.ignore(1000, '\n');
+        input = toupper(input);
+
+        if(input == 'A' || input == 'D' || input == 'F' ||input == 'I' || input == 
+        'R' || input == 'G')
         {
-            cout << "Will you [A]ttack/[D]odge/[F]lee/[I]tem/[R]isky Final attack/[G]ameplay logic: " << endl;
-            cin >> input;
+
+
+            
             if(input == 'A')
             {
+                
                 weapondamage(sword,axe,spear, player, enemy);
                 cout << "Choose one of your current weapon " << endl;;
                 cout << "[E]xcalibur" << endl;
@@ -528,6 +562,8 @@ void choice(Enemy& enemy, Player& player, bool& flee)
                 cout << "[S]pear" << endl;
 
                 cin >> input;
+                cin.ignore(1000, '\n');
+                input = toupper(input);
 
                 if(input == 'A')
                 {
@@ -553,7 +589,7 @@ void choice(Enemy& enemy, Player& player, bool& flee)
                 }
                 else
                 {
-                    cout << " Invalid weapon choice " << endl;
+                    cout << "Invalid weapon choice " << endl;
                 
                 }
             
@@ -605,52 +641,77 @@ void choice(Enemy& enemy, Player& player, bool& flee)
                 {
                     cout << "would you like to [B]uy some potions or [U]se your own potion or [E]xit" << endl;
                     cin >> input;
+                    cin.ignore(1000, '\n');
+                    input = toupper(input);
                     
                     if(input == 'B')
                     {
                         cout << "[L]uck potion (1 level) or [E]xit" << endl;
                         cin >> input;
-                            if (player.level >= 1)
+                        cin.ignore(1000, '\n');
+                        input = toupper(input);
+                        if (player.level >= 1)
+                        {
+                            if(input == 'L')
                             {
-                                if(input == 'L')
-                                {
-                                    bool drank = true;
-                                    items(player, drank);
+                                bool drank = true;
+                                items(player, drank);
 
-                                    cout << "youll be feeling extra lucky -merchant " << endl;
-                                    player.level -= 1;
-                                    cout << "-1 level " << "Your current level " << player.level << endl;
-                                    cout << "you drank the potion " << endl;
+                                cout << "youll be feeling extra lucky -merchant " << endl;
+                                player.level -= 1;
+                                cout << "-1 level " << "Your current level " << player.level << endl;
+                                cout << "you drank the potion " << endl;
 
                             
-                                }
-                                else
-                                {
+                            }
+                            else if (input == 'E')
+                            {
                                     
-                                    input = 'E';
-                                }
+                                
                             }
                             else
                             {
-                                cout << "Your out of levels go out and kill a few beast" << endl;
-                                cout << "your current level " << player.level << endl;
-                                input = 'E';
-                            }
-
-                            
-                        
-                            if(input == 'U') //for inventory when someone makes it
-                            {
-                            
+                                cout << "Invalid input " << endl;
+                                input = 'B';
                             }
                         }
+                        else 
+                        {
+                            cout << "Your out of levels go out and kill a few beast" << endl;
+                            cout << "your current level " << player.level << endl;
+                            input = 'E';
+                        }
+
+                            
                         
-                    }while(input != 'E');
-                     
+                        
+                    }
+                    else if (input == 'U')
+                    {
+                        
+                    }
+                    else if (input == 'E')
+                    {
+
+                    }
+                    else
+                    {
+                        cout << "invalid input" << endl;
+                    }
+
+                
+                }while(input != 'E');
                 cout << "you exited " << endl;
                 continue;
-
             }
+        
+        
+                        
+        
+                     
+        
+
+    
 
             if (input == 'G')
             {
@@ -697,8 +758,8 @@ void choice(Enemy& enemy, Player& player, bool& flee)
                 cout << "Thanks for checking this out" << endl;
                 player.luck += 1; //secret mechanic 
                 valid = false;
+        
             }
-
             if (input == 'R')
             {
                 
@@ -729,38 +790,45 @@ void choice(Enemy& enemy, Player& player, bool& flee)
                     cout << "due to your risk you left yourself wide open " << endl;
                     for(int i = 0; i < 1 + player.luck; i++)
                     {
-                    chance = rand() % 10;
+                        chance = rand() % 10;
                             
-                    if (chance == 4)
-                    {
-                        escape = true;
-                        break;
+                        if (chance == 4)
+                        {
+                            escape = true;
+                            break;
+                        }
+                            
                     }
-                            
-                }
 
-                if (escape == true)
-                {
-                    cout << "consider yourself lucky you managed to narrowly escape that mean additional goblins attack " << endl;
-                    cout << player.hp << endl;
-                    valid = true;
+                    if (escape == true)
+                    {
+                        cout << "consider yourself lucky you managed to narrowly escape that mean additional goblins attack " << endl;
+                        cout << player.hp << endl;
+                        valid = true;
                         
                             
+                    }
+                    else
+                    {
+                        cout << enemy.name << " made an additional attack" << endl;
+                        player.hp -= 20;
+                        cout << player.name << " HP: " << player.hp << endl;
+                        valid = true;
+                    }
                 }
-                else
-                {
-                    cout << enemy.name << " made an additional attack" << endl;
-                    player.hp -= 20;
-                    cout << player.name << " HP: " << player.hp << endl;
-                    valid = true;
-                }
+
             }
         }
-            
-    }while (!valid);
-    cin.ignore();
-        
-        
-        
+        else
+        {
+            cout << "invalid input try again. " << endl;
+        }
+
+
+    }while(!valid);
+    
+
 }
 
+    
+        
