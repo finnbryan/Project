@@ -16,6 +16,32 @@ Version: 1.0
 
 using namespace std;
 
+struct Item
+{
+    int garlic;
+    int stake;
+    int healthpotion;
+    int luckpotion;
+
+};
+
+class Chest
+{
+    public:
+    Item contents;
+    bool opened;
+
+    Chest()
+    {
+        contents.garlic = 0;
+        contents.stake = 0;
+        contents.healthpotion = 0;
+        contents.luckpotion = 0;
+
+        opened = false;
+    }
+};
+
 class Move{ 
 
     public:
@@ -33,7 +59,7 @@ class Player{
     int hp;
     int level;
     int room;
-    string inventory[20];
+    Item inventory[10];
     int luck;
 
 
@@ -77,6 +103,7 @@ class Room{
     int east;
     int south;
     int west;
+    Chest roomchest;
 
     Room()
     {
@@ -114,6 +141,56 @@ class Room{
 
 
 
+
+
+
+void chest(Player &player, Chest &chest)
+{
+    cout << "Would you like to open a chest. " << endl;
+    cout << "[Y]es or [N]o" << endl;
+    char input;
+    cin >> input;
+    cin.ignore(1000, '\n');
+    input = toupper(input);
+    
+    if (chest.opened)
+    {
+        cout << "cmon you thought you could loot this thing twice? " << endl;
+        cout << "go find explore and find a closed chest " << endl;
+        return;
+    }
+
+    if(input == 'Y')
+    {
+        cout << "You have opened a chest " << endl;
+        cout << "Garlic: " << chest.contents.garlic << endl;
+        cout << "Stakes: " << chest.contents.stake << endl;
+        cout << "luck potion: " << chest.contents.luckpotion << endl;
+        cout << "Health potion: " << chest.contents.healthpotion << endl;
+        chest.opened = true;
+
+        player.inventory[0].garlic += chest.contents.garlic;
+        player.inventory[0].stake += chest.contents.stake;
+        player.inventory[0].luckpotion += chest.contents.luckpotion;
+        player.inventory[0].healthpotion += chest.contents.healthpotion;
+        
+
+    }
+    else if(input == 'N')
+    {
+        cout << "you left the chest" << endl;
+        
+    }
+    else
+    {
+        cout << "Invalid input " << endl;
+    }
+
+}
+
+
+
+
 void fight(Player&, Enemy&);
 void roomStuff(Player&, Room&);
 void movePlayer(Player& , Room[]);
@@ -139,6 +216,9 @@ int main(){
     player.hp = 100;
     player.level = 1;
     player.room = 0;
+
+    player.inventory[0].luckpotion = 1;
+    player.inventory[0].healthpotion = 1;
 
 
     cout << "Please enter your Characters name: ";
@@ -222,6 +302,8 @@ void fight(Player& player, Enemy& enemy){
 
 }
 
+
+
 void roomStuff(Player &player, Room &room){
 
     cout << room.description << endl;
@@ -243,10 +325,12 @@ void roomStuff(Player &player, Room &room){
                 exit(0);
             }
         }
+        
 
         room.explored = true;
+        
     }
-
+    chest(player, room.roomchest);
 
 }
 
@@ -258,7 +342,10 @@ void mapConstructor(Room rooms[]){
     "A dark cave entrance.",
     -1, 1, -1, -1,
     Enemy()
+    
+    
     );
+    
 
     rooms[1] = Room(
     1,
@@ -282,6 +369,10 @@ void mapConstructor(Room rooms[]){
     );
 
     rooms[0].roomEnemy = getEnemy("Ghost");
+    rooms[0].roomchest.contents.healthpotion = 2;
+    rooms[0].roomchest.contents.luckpotion = 1;
+    
+    
 
 
 }
@@ -496,31 +587,33 @@ void weapondamage(int &sword, int &axe, int &spear, Player& player, Enemy& enemy
     }
 }
 
-int items(Player& player, bool& drank)
-{
-    
-    if(drank == true)
-    {
-        player.luck += 15;
-        
-    }
-    return player.luck;
-}
+
 
 void choice(Enemy& enemy, Player& player, bool& flee)
-    {
-        int sword, spear, axe, chance;
-        char input;
+{
+    int sword, spear, axe, chance;
+    char input;
         
-        bool valid = false;
-        bool escape = false;
-        
-        do
+    bool valid = false;
+    bool escape = false;
+
+    
+    do
+    {  
+        cout << "Will you [A]ttack/[D]odge/[F]lee/[I]tem/[R]isky Final attack/[G]ameplay logic: " << endl;
+        cin >> input;
+        cin.ignore(1000, '\n');
+        input = toupper(input);
+
+        if(input == 'A' || input == 'D' || input == 'F' ||input == 'I' || input == 
+        'R' || input == 'G')
         {
-            cout << "Will you [A]ttack/[D]odge/[F]lee/[I]tem/[R]isky Final attack/[G]ameplay logic: " << endl;
-            cin >> input;
+
+
+            
             if(input == 'A')
             {
+                
                 weapondamage(sword,axe,spear, player, enemy);
                 cout << "Choose one of your current weapon " << endl;;
                 cout << "[E]xcalibur" << endl;
@@ -528,6 +621,8 @@ void choice(Enemy& enemy, Player& player, bool& flee)
                 cout << "[S]pear" << endl;
 
                 cin >> input;
+                cin.ignore(1000, '\n');
+                input = toupper(input);
 
                 if(input == 'A')
                 {
@@ -553,7 +648,7 @@ void choice(Enemy& enemy, Player& player, bool& flee)
                 }
                 else
                 {
-                    cout << " Invalid weapon choice " << endl;
+                    cout << "Invalid weapon choice " << endl;
                 
                 }
             
@@ -605,52 +700,114 @@ void choice(Enemy& enemy, Player& player, bool& flee)
                 {
                     cout << "would you like to [B]uy some potions or [U]se your own potion or [E]xit" << endl;
                     cin >> input;
+                    cin.ignore(1000, '\n');
+                    input = toupper(input);
                     
                     if(input == 'B')
                     {
                         cout << "[L]uck potion (1 level) or [E]xit" << endl;
                         cin >> input;
-                            if (player.level >= 1)
+                        cin.ignore(1000, '\n');
+                        input = toupper(input);
+                        if (player.level >= 1)
+                        {
+                            if(input == 'L')
                             {
-                                if(input == 'L')
-                                {
-                                    bool drank = true;
-                                    items(player, drank);
+                                
 
-                                    cout << "youll be feeling extra lucky -merchant " << endl;
-                                    player.level -= 1;
-                                    cout << "-1 level " << "Your current level " << player.level << endl;
-                                    cout << "you drank the potion " << endl;
+                                cout << "youll be feeling extra lucky -merchant " << endl;
+                                player.level -= 1;
+                                player.luck += 15;
+                                cout << "-1 level " << "Your current level " << player.level << endl;
+                                cout << "you drank the potion " << endl;
+                                cout << player.name << " luck: " << player.luck << endl;
 
                             
-                                }
-                                else
-                                {
+                            }
+                            else if (input == 'E')
+                            {
                                     
-                                    input = 'E';
-                                }
+                                
                             }
                             else
                             {
-                                cout << "Your out of levels go out and kill a few beast" << endl;
-                                cout << "your current level " << player.level << endl;
-                                input = 'E';
+                                cout << "Invalid input " << endl;
+                                input = 'B';
                             }
+                        }
+                        else 
+                        {
+                            cout << "Your out of levels go out and kill a few beast" << endl;
+                            cout << "your current level " << player.level << endl;
+                            input = 'E';
+                        }
 
                             
                         
-                            if(input == 'U') //for inventory when someone makes it
+                        
+                    }
+                    else if (input == 'U')
+                    {
+                        cout << "Use your [L]uck potion or [H]ealth potion" << endl;
+                        cin >> input;
+                        cin.ignore(1000, '\n');
+                        input = toupper(input);
+                        if (input == 'L')
+                        {
+                            if(player.inventory[0].luckpotion > 0)
                             {
-                            
+                                cout << "you consumed a luck potion" << endl;
+                                player.inventory[0].luckpotion --;
+                                cout << "remaining luck potions: " << player.inventory[0].luckpotion << endl;
+                                player.luck += 15;
+                                cout << player.name << " luck: " << player.luck << endl;
+                            }
+                            else
+                            {
+                                cout << "you got no luck potions bud" << endl;
+                            }
+                        }
+                        else if (input == 'H')
+                        {
+                            if(player.inventory[0].healthpotion > 0)
+                            {
+                                cout << "you consumed a health potion" << endl;
+                                player.inventory[0].healthpotion --;
+                                cout << "remaining health potions: " << player.inventory[0].healthpotion << endl;
+                                player.hp += 15;
+                                cout << player.name << " HP: " << player.hp << endl;
+                            }
+                            else
+                            {
+                                cout << "you got no luck potions bud" << endl;
                             }
                         }
                         
-                    }while(input != 'E');
-                     
+
+
+                    }
+                    else if (input == 'E')
+                    {
+
+                    }
+                    else
+                    {
+                        cout << "invalid input" << endl;
+                    }
+
+                
+                }while(input != 'E');
                 cout << "you exited " << endl;
                 continue;
-
             }
+        
+        
+                        
+        
+                     
+        
+
+    
 
             if (input == 'G')
             {
@@ -697,8 +854,8 @@ void choice(Enemy& enemy, Player& player, bool& flee)
                 cout << "Thanks for checking this out" << endl;
                 player.luck += 1; //secret mechanic 
                 valid = false;
+        
             }
-
             if (input == 'R')
             {
                 
@@ -729,38 +886,45 @@ void choice(Enemy& enemy, Player& player, bool& flee)
                     cout << "due to your risk you left yourself wide open " << endl;
                     for(int i = 0; i < 1 + player.luck; i++)
                     {
-                    chance = rand() % 10;
+                        chance = rand() % 10;
                             
-                    if (chance == 4)
-                    {
-                        escape = true;
-                        break;
+                        if (chance == 4)
+                        {
+                            escape = true;
+                            break;
+                        }
+                            
                     }
-                            
-                }
 
-                if (escape == true)
-                {
-                    cout << "consider yourself lucky you managed to narrowly escape that mean additional goblins attack " << endl;
-                    cout << player.hp << endl;
-                    valid = true;
+                    if (escape == true)
+                    {
+                        cout << "consider yourself lucky you managed to narrowly escape that mean additional goblins attack " << endl;
+                        cout << player.hp << endl;
+                        valid = true;
                         
                             
+                    }
+                    else
+                    {
+                        cout << enemy.name << " made an additional attack" << endl;
+                        player.hp -= 20;
+                        cout << player.name << " HP: " << player.hp << endl;
+                        valid = true;
+                    }
                 }
-                else
-                {
-                    cout << enemy.name << " made an additional attack" << endl;
-                    player.hp -= 20;
-                    cout << player.name << " HP: " << player.hp << endl;
-                    valid = true;
-                }
+
             }
         }
-            
-    }while (!valid);
-    cin.ignore();
-        
-        
-        
+        else
+        {
+            cout << "invalid input try again. " << endl;
+        }
+
+
+    }while(!valid);
+    
+
 }
 
+    
+        
